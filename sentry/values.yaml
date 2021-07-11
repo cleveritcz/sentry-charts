@@ -428,7 +428,7 @@ slack: {}
 #   Reference -> https://develop.sentry.dev/integrations/slack/
 
 nginx:
-  enabled: true
+  enabled: false
   containerPort: 8080
   existingServerBlockConfigmap: '{{ template "sentry.fullname" . }}'
   resources: {}
