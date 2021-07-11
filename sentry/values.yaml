@@ -615,6 +615,7 @@ postgresql:
   nameOverride: sentry-postgresql
   postgresqlUsername: postgres
   postgresqlDatabase: sentry
+  postgresqlPassword: sentry
   replication:
     enabled: false
     readReplicas: 2
