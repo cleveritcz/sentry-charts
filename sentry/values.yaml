@@ -451,11 +451,11 @@ ingress:
   #   kubernetes.io/ingress.class: nginx
   #   nginx.ingress.kubernetes.io/use-regex: "true"
   #
-  # hostname:
+  hostname:
   #
-  # tls:
-  # - secretName:
-  #   hosts:
+  tls:
+  - secretName:
+    hosts:
 
 filestore:
   # Set to one of filesystem, gcs or s3 as supported by Sentry.
