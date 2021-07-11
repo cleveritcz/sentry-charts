@@ -488,7 +488,7 @@ filestore:
       ## Please note that you may need to change your accessMode to ReadWriteMany
       ## if you plan on having the web, worker and cron deployments run on
       ## different nodes.
-      persistentWorkers: false
+      persistentWorkers: true
 
   gcs: {}
     ## Point this at a pre-configured secret containing a service account. The resulting
@@ -617,10 +617,10 @@ postgresql:
   postgresqlDatabase: sentry
   postgresqlPassword: sentry
   replication:
-    enabled: false
+    enabled: true
     readReplicas: 2
     synchronousCommit: "on"
-    numSynchronousReplicas: 1
+    numSynchronousReplicas: 2
     applicationName: sentry
 
 ## This value is only used when postgresql.enabled is set to false
