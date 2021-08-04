@@ -33,11 +33,25 @@ images:
     # pullPolicy: IfNotPresent
     imagePullSecrets: []
 
+serviceAccount:
+  # serviceAccount.annotations -- Additional Service Account annotations.
+  annotations: {}
+  # serviceAccount.enabled -- If `true`, a custom Service Account will be used.
+  enabled: false
+  # serviceAccount.name -- The base name of the ServiceAccount to use. Will be appended with e.g. `snuba-api` or `web` for the pods accordingly.
+  name: "sentry"
+  # serviceAccount.automountServiceAccountToken -- Automount API credentials for a Service Account.
+  automountServiceAccountToken: true
+
 relay:
   replicas: 1
   mode: managed
   env: []
+  probeFailureThreshold: 5
   probeInitialDelaySeconds: 10
+  probePeriodSeconds: 10
+  probeSuccessThreshold: 1
+  probeTimeoutSeconds: 2
   resources: {}
   affinity: {}
   nodeSelector: {}
@@ -60,7 +74,11 @@ sentry:
     strategyType: RollingUpdate
     replicas: 1
     env: []
+    probeFailureThreshold: 5
     probeInitialDelaySeconds: 10
+    probePeriodSeconds: 10
+    probeSuccessThreshold: 1
+    probeTimeoutSeconds: 2
     resources: {}
     affinity: {}
     nodeSelector: {}
@@ -125,6 +143,11 @@ sentry:
       targetCPUUtilizationPercentage: 50
     sidecars: [ ]
     volumes: [ ]
+
+    # volumeMounts:
+    #   - mountPath: /dev/shm
+    #     name: dshm
+
   cron:
     replicas: 1
     env: []
@@ -195,6 +218,14 @@ snuba:
     # queuedMaxMessagesKbytes: ""
     # queuedMinMessages: ""
 
+    # volumeMounts:
+    #   - mountPath: /dev/shm
+    #     name: dshm
+    # volumes:
+    #   - name: dshm
+    #     emptyDir:
+    #       medium: Memory
+
   outcomesConsumer:
     replicas: 1
     env: []
@@ -212,6 +243,14 @@ snuba:
     # queuedMaxMessagesKbytes: ""
     # queuedMinMessages: ""
 
+    # volumeMounts:
+    #   - mountPath: /dev/shm
+    #     name: dshm
+    # volumes:
+    #   - name: dshm
+    #     emptyDir:
+    #       medium: Memory
+
   replacer:
     replicas: 1
     env: []
@@ -222,6 +261,9 @@ snuba:
     # tolerations: []
     # podLabels: []
     maxBatchSize: "3"
+    # maxBatchTimeMs: ""
+    # queuedMaxMessagesKbytes: ""
+    # queuedMinMessages: ""
 
   sessionsConsumer:
     replicas: 1
@@ -240,6 +282,14 @@ snuba:
     # queuedMaxMessagesKbytes: ""
     # queuedMinMessages: ""
 
+    # volumeMounts:
+    #   - mountPath: /dev/shm
+    #     name: dshm
+    # volumes:
+    #   - name: dshm
+    #     emptyDir:
+    #       medium: Memory
+
   transactionsConsumer:
     replicas: 1
     env: []
@@ -256,6 +306,14 @@ snuba:
     # maxBatchTimeMs: ""
     # queuedMaxMessagesKbytes: ""
     # queuedMinMessages: ""
+
+    # volumeMounts:
+    #   - mountPath: /dev/shm
+    #     name: dshm
+    # volumes:
+    #   - name: dshm
+    #     emptyDir:
+    #       medium: Memory
 
   dbInitJob:
     env: []
@@ -436,6 +494,10 @@ nginx:
   service:
     type: ClusterIP
     port: 80
+  ## Use this to enable an extra service account
+  # serviceAccount:
+  #   create: false
+  #   name: nginx
 
 ingress:
   enabled: false
@@ -547,6 +609,13 @@ clickhouse:
         - "ReadWriteOnce"
         storage: "30Gi"
 
+  ## Use this to enable an extra service account
+  # serviceAccount:
+  #   annotations: {}
+  #   enabled: false
+  #   name: "sentry-clickhouse"
+  #   automountServiceAccountToken: true
+
 ## This value is only used when clickhouse.enabled is set to false
 ##
 externalClickhouse:
@@ -582,6 +651,17 @@ kafka:
   service:
     port: 9092
 
+  ## Use this to enable an extra service account
+  # serviceAccount:
+  #   create: false
+  #   name: kafka
+
+  ## Use this to enable an extra service account
+  # zookeeper:
+  #   serviceAccount:
+  #     create: false
+  #     name: zookeeper
+
 ## This value is only used when kafka.enabled is set to false
 ##
 externalKafka:
@@ -599,6 +679,10 @@ redis:
   master:
     persistence:
       enabled: true
+  ## Use this to enable an extra service account
+  # serviceAccount:
+  #   create: false
+  #   name: sentry-redis
 
 ## This value is only used when redis.enabled is set to false
 ##
@@ -622,6 +706,9 @@ postgresql:
     synchronousCommit: "on"
     numSynchronousReplicas: 2
     applicationName: sentry
+  ## Use this to enable an extra service account
+  # serviceAccount:
+  #   enabled: false
 
 ## This value is only used when postgresql.enabled is set to false
 ##
@@ -697,7 +784,10 @@ rabbitmq:
     existingSecret: load-definition
   extraConfiguration: |
     load_definitions = /app/load_definition.json
-
+  ## Use this to enable an extra service account
+  # serviceAccount:
+  #   create: false
+  #   name: rabbitmq
 
 ## Prometheus Exporter / Metrics
 ##
